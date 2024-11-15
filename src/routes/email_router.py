@@ -32,6 +32,21 @@ fm = FastMail(conf)
 
 @router.post("/send-email")
 async def send_in_background(background_tasks: BackgroundTasks, body: EmailSchema):
+    """
+    The send_in_background function generates a verification token and sends a verification email asynchronously using background tasks.
+    The email includes a link with the token that can be used for email verification.
+
+    :param background_tasks: The FastAPI BackgroundTasks instance that allows the task 
+                              to be processed asynchronously.
+    :param body: The body of the request containing the user's email and optional fullname.
+
+    :return: A dictionary with a success message if the email was successfully queued 
+             for sending.
+    
+    :raise: HTTPException: 
+        - If there is a connection error when attempting to send the email.
+        - If any other unexpected error occurs during the process.
+    """
     try:
         token_verification = auth_service.create_email_token({"sub": body.email})
         message = MessageSchema(
@@ -51,6 +66,15 @@ async def send_in_background(background_tasks: BackgroundTasks, body: EmailSchem
 
 @router.get('/confirmed_email/{token}')
 async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
+    """
+    The confirmed_email function confirms the user's email address using the provided token.
+    
+    :param token: str: Retrieve the email from the token
+    :param db: AsyncSession: Pass in the database session
+    :raise: HTTPException: HTTP_400_BAD_REQUEST If user's email is already confirmed
+    :return: A success message after the user's email confirmed
+    """
+
     email = await auth_service.get_email_from_token(token)
     user = await repositories_users.get_user_by_email(email, db)
     if user is None:
@@ -64,6 +88,17 @@ async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
 @router.post('/request_email')
 async def request_email(body: RequestEmail, background_tasks: BackgroundTasks, request: Request,
                         db: AsyncSession = Depends(get_db)):
+    """
+    The request_email function checks if the user's email is already confirmed
+    
+    :param body: The request body containing the user's email address
+    :param background_tasks: The FastAPI BackgroundTasks instance that allows the 
+                              email verification task to be processed asynchronously
+    :param db: AsyncSession: Pass in the database session
+    :return: dict.: A message indicating whether the email was already 
+             confirmed or if the user should check their inbox for the verification email
+    """
+    
     user = await repositories_users.get_user_by_email(body.email, db)
 
     if user.confirmed:
@@ -71,11 +106,4 @@ async def request_email(body: RequestEmail, background_tasks: BackgroundTasks, r
     if user:
         background_tasks.add_task(send_email, user.email, user.username, str(request.base_url))
     return {"message": "Check your email for confirmation."}
-
-# @router.get('/{username}')
-# async def request_email(username: str, response: Response, db: AsyncSession = Depends(get_db)):
-#     print('--------------------------------')
-#     print(f'{username} зберігаємо що він відкрив email в БД')
-#     print('--------------------------------')
-#     return FileResponse("src/static/open_check.png", media_type="image/png", content_disposition_type="inline")
 

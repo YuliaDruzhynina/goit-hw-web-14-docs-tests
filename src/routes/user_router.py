@@ -11,16 +11,25 @@ from src.services.auth import auth_service
 from src.conf.config import settings
 from src.schemas import UserResponse
 
+# Initialize a FastAPI APIRouter instance for the current module or endpoint group
 router = APIRouter()
+# Configure Cloudinary settings with the credentials provided in the app's settings
 cloudinary.config(
-    cloud_name=settings.CLOUDINARY_NAME,
-    api_key=settings.CLOUDINARY_API_KEY,
-    api_secret=settings.CLOUDINARY_API_SECRET,
-    secure=True,
+    cloud_name=settings.CLOUDINARY_NAME, # Cloudinary cloud name from app settings
+    api_key=settings.CLOUDINARY_API_KEY, # Cloudinary API key from app settings
+    api_secret=settings.CLOUDINARY_API_SECRET, # Cloudinary API secret from app settings
+    secure=True, # Enable secure URLs for media
     )
 
 @router.get("/me/", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
+    """
+    The read_users_me function returns the details of the currently authenticated user
+    
+    :param current_user: The currently authenticated user, automatically injected 
+                          by FastAPI's `Depends` function and the authentication service
+    :return: UserResponse: model containing the user's details (e.g., username, email, etc.)
+    """
     return current_user
 
 
@@ -34,6 +43,16 @@ async def update_avatar_url(
     current_user: User = Depends(auth_service.get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    The update_avatar_url function udates the avatar URL for the currently authenticated user.
+    
+    :param file: The image file to be uploaded as the user's avatar by user
+    :param current_user: get current_user object with UserResponse model from Depends User object
+    :param Depends(RateLimiter): Rate-limited to 1 request per 20 seconds.
+    :param db: AsyncSession: get the database session for the request
+    :return: The updated user object with the new avatar URL
+    """
+    
     public_id = f"cloud_store/{current_user.email}"
     #print(f"Generated public_id: {public_id}")
     resource = cloudinary.uploader.upload(file.file, public_id=public_id, overwrite=True)

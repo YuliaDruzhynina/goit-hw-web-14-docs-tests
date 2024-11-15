@@ -24,6 +24,15 @@ conf = ConnectionConfig(
 
 
 async def send_email(email: EmailStr, username: str, host: str):
+    """
+    The send_email function is used to send an email asynchronously with the given email, username, and host.
+
+    :param email: EmailStr: Specify the email address to send the email to
+    :param username: str: Send the username to the email template
+    :param host: str: Pass in the host for the email
+    :return: None
+    """
+    
     try:
         token_verification = auth_service.create_email_token({"sub": email})
         message = MessageSchema(

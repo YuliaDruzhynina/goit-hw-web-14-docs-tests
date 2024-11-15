@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_limiter.depends import RateLimiter
 
 from typing import List
+
 # import json
 from src.database.db import get_db
 from src.entity.models import User, Role
@@ -18,6 +19,11 @@ access_to_route_all = RoleAccess([Role.admin, Role.moderator])
 
 @router.get("/")
 def main_root():
+    """
+    The get function tests the startup of the application to ensure the application is running correctly.
+    :return: A dictionary with a greeting message.
+    """
+
     return {"message": "Hello, fastapi application!"}
 
 
@@ -30,7 +36,16 @@ async def create_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    return await repository_contacts.create_contact(body, db, user)#user_id
+    """
+    The create_contact function creates a new contact.
+    :param RateLimiter: Rate-limited to 1 request per 20 seconds.
+    :param body: ContactSchema,: Pass the contact data to be created
+    :param db: AsyncSession: Pass the database session dependency
+    :param user: User: Get the currently authenticated user
+    :return: A contact object
+    """
+
+    return await repository_contacts.create_contact(body, db, user)  # user_id
 
 
 @router.get(
@@ -39,7 +54,7 @@ async def create_contact(
     dependencies=[
         Depends(access_to_route_all),
         Depends(RateLimiter(times=1, seconds=20)),
-    ]
+    ],
 )
 async def get_all_contacts(
     limit: int = Query(default=10),
@@ -47,6 +62,18 @@ async def get_all_contacts(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The get_all_contacts function retrieves all contacts with pagination support from the database.
+
+    :param Depends(access_to_route_all): This ensures that only authorized users can access this route.
+    :param Depends(RateLimiter): Rate-limited to 1 request per 20 seconds.
+    :param limit: int: Limit the number of contacts returned
+    :param offset: int: Determine how many records to skip
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Ensure that the user making the request is authorized to do
+    :return: list[ContactResponse]: A list of `Contact` objects
+    """
+
     return await repository_contacts.get_all_contacts(limit, offset, db)
 
 
@@ -58,9 +85,18 @@ async def get_contact_by_id(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
-    contact = await repository_contacts.get_contact_by_id(
-        limit, offset, contact_id, db
-    )
+    """
+    The get_contact_by_id function retrieves a contact  by its ID with pagination support from the database.
+
+    :param limit: int: Limit the number of contacts returned
+    :param offset: int: Determine how many records to skip
+    :param contact_id: int: Specify the id of the contact to retrieve
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Ensure that the user making the request is authorized to do
+    :return: A ContactResponse object
+    """
+
+    contact = await repository_contacts.get_contact_by_id(limit, offset, contact_id, db)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NOT FOUND")
     return contact
@@ -74,6 +110,17 @@ async def get_contact_by_fullname(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The get_contact_by_fullname function retrieves a contact by its fullname with pagination support from the database.
+
+    :param limit: int: Limit the number of contacts returned
+    :param offset: int: Determine how many records to skip
+    :param contact_fullname: int: Specify the contact_fullname of the contact to retrieve
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Ensure that the user making the request is authorized to do
+    :return: A ContactResponse object
+    """
+
     contact = await repository_contacts.get_contact_by_fullname(
         limit, offset, contact_fullname, db, user
     )
@@ -90,6 +137,17 @@ async def get_contact_by_email(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The get_contact_by_fullname function retrieves a contact by its email with pagination support from the database.
+
+    :param limit: int: Limit the number of contacts returned
+    :param offset: int: Determine how many records to skip
+    :param contact_email: int: Specify the contact_fullname of the contact to retrieve
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Ensure that the user making the request is authorized to do
+    :return: A ContactResponse object
+    """
+
     return await repository_contacts.get_contact_by_email(
         limit, offset, contact_email, db, user
     )
@@ -102,6 +160,14 @@ async def get_upcoming_birthdays(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The get_upcoming_birthdays function retrieves a list of birthsdays during nearest 7 days from today from the database.
+
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Ensure that the user making the request is authorized to do
+    :return: list[ContactResponse]: A list of ContactResponse objects
+    """
+
     return await repository_contacts.get_upcoming_birthdays(db, user)
 
 
@@ -113,6 +179,15 @@ async def get_upcoming_birthdays_from_new_date(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The get_upcoming_birthdays_from_new_date function retrieves a list of birthsdays during nearest 7 days
+    from new today from the database with pagination support.
+
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Ensure that the user making the request is authorized to do
+    :return: list[ContactResponse]: A list of ContactResponse objects
+    """
+
     return await repository_contacts.get_upcoming_birthdays_from_new_date(
         new_date, limit, offset, db, user
     )
@@ -123,8 +198,18 @@ async def update_contact(
     body: ContactSchema,
     contact_id: int = Path(..., ge=1),
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(auth_service.get_current_user)
+    user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The update_contact function updates a contact with the given contact_id using the provided ContactSchema body.
+
+    :param body: ContactSchema: Pass the updated contact information to the function
+    :param contact_id: int: Identify the contact to be deleted
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Get the current authenticated user
+    :return: A contactresponse object
+    """
+
     contact = await repository_contacts.update_contact(body, contact_id, db, user)
     if not contact:
         raise HTTPException(
@@ -139,23 +224,15 @@ async def delete_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    """
+    The delete_contact function deletes a contact with the given contact_id.
+
+    :param contact_id: int: Identify the contact to be deleted
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Get the current authenticated user
+    :return: The massage with information about succefull deleting of the contact.
+    :raise: HTTPException: If the contact is not found raises a 404 error.
+    """
+
     result = await repository_contacts.delete_contact(contact_id, db)
     return result
-
-
-# @router.get("/contacts", response_model=list[ContactResponse])
-# async def get_contacts(
-#     limit: int = Query(default=10),
-#     offset: int = Query(default=0),
-#     db: AsyncSession = Depends(get_db),
-#     redis_client=Depends(get_redis_client)
-# ):
-#     cache_key = f"contacts:limit={limit}:offset={offset}"
-#     данные из кэша
-#     cached_data = await redis_client.get(cache_key)
-#     if cached_data:
-#         return json.loads(cached_data)
-#     # Если данных нет в кэше, получите их из базы данных
-#     contacts = await repository_contacts.get_contacts(limit=limit, offset=offset, db=db)
-#     await redis_client.set(cache_key, ex=60)
-#     return contacts

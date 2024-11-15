@@ -2,8 +2,7 @@ import enum
 from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, String, Enum
 
 # from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship  # declarative_base
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import relationship, DeclarativeBase
 
 # Base = declarative_base()
 
