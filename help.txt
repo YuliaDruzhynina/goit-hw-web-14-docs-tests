@@ -17,3 +17,13 @@ rm -rf migrations
 alembic init migrations
 alembic init -t async alembic
 sqlalchemy.url = postgresql+asyncpg://postgres:567234@localhost:5432/restapp_hw13 асинхронный двигун 
+
+uvicorn main:app --host localhost --port 8000 --reload
+http://127.0.0.1:8000/api/healthchecker
+http://127.0.0.1:8000/docs   Swagger
+http://127.0.0.1:8000/redoc ReDoc
+http://127.0.0.1:8000/openapi.json
+example: http://127.0.0.1:8000/notes/10
+
+python -m unittest tests.test_repository_contacts
+? #PYTHONPATH=../src python -m unittest discover -s . -p "test_*.py"

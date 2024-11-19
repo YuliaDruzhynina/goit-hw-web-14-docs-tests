@@ -24,7 +24,7 @@ async def create_contact(body: ContactSchema, db: AsyncSession, user: User):
     contact = await db.execute(
         select(Contact).filter(Contact.email == body.email, Contact.user == user)
     )
-    existing_contact = contact.scalar_one_or_none()
+    existing_contact = await contact.scalar_one_or_none()
     if existing_contact:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Contact already exists!"
@@ -77,7 +77,9 @@ async def get_contact_by_id(
     result = await db.execute(stmt)
     if result is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NOT FOUND")
-    contact = result.scalar_one_or_none()
+    contact = await result.scalar_one_or_none()
+    if contact is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NOT FOUND")
     return contact
 
 
@@ -103,7 +105,7 @@ async def get_contact_by_fullname(
         .offset(offset)
     )
     result = await db.execute(stmt)
-    contact = result.scalar_one_or_none()
+    contact = await result.scalar_one_or_none()
     return contact
 
 
@@ -129,7 +131,7 @@ async def get_contact_by_email(
         .offset(offset)
     )
     result = await db.execute(stmt)
-    contact = result.scalar_one_or_none()
+    contact = await result.scalar_one_or_none()
     return contact
 
 

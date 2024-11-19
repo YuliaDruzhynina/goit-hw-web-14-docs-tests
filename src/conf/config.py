@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     redis_password: str | None = None
 
     class Config:
-        env_file = "../../env"
+        env_file = "../../.env"
         env_file_encoding = "utf-8"
         from_attributes = True
 
