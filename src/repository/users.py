@@ -22,7 +22,7 @@ async def get_user_by_email(email: str, db: AsyncSession = Depends(get_db)):
 
     stmt = select(User).filter(User.email == email)
     result = await db.execute(stmt)
-    user = result.scalar_one_or_none()
+    user = await result.scalar_one_or_none()
     return user
 
 
@@ -76,6 +76,8 @@ async def confirmed_email(email: str, db: AsyncSession) -> None:
     """
 
     user = await get_user_by_email(email, db)
+    if user is None:
+        raise ValueError(f"User with email {email} not found")
     user.confirmed = True
     await db.commit()
 
@@ -90,6 +92,8 @@ async def update_avatar_url(email: str, url: str | None, db: AsyncSession) -> Us
     """
 
     user = await get_user_by_email(email, db)
+    if user is None:
+        raise ValueError("User not found")
     user.avatar = url
     await db.commit()
     await db.refresh(user)

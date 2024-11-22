@@ -1,9 +1,7 @@
 # python -m unittest tests.test_repository_contacts
-
 import unittest
 from unittest.mock import MagicMock, AsyncMock
 
-# from datetime import date, datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
