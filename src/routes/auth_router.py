@@ -59,9 +59,16 @@ async def signup(
         )
     body.password = auth_service.get_password_hash(body.password)
     new_user = await repositories_users.create_user(body, db)
+    # if not new_user:
+    #         raise HTTPException(status_code=400, detail="Failed to create user")
+
     background_tasks.add_task(
         send_email, new_user.email, new_user.username, request.base_url
     )
+    # return UserResponse(username=new_user.username, email=new_user.email, avatar=new_user.avatar)
+    
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail="Internal Server Error")
     return new_user
 
 

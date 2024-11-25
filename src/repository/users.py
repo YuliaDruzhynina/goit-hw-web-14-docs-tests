@@ -26,7 +26,7 @@ async def get_user_by_email(email: str, db: AsyncSession = Depends(get_db)):
     return user
 
 
-async def create_user(body: UserModel, db: AsyncSession = Depends(get_db)):
+async def create_user(body: UserModel, db: AsyncSession = Depends(get_db)) -> User:
 
     """
     The create_user function creates ands retrieves new user and his details.
@@ -43,6 +43,8 @@ async def create_user(body: UserModel, db: AsyncSession = Depends(get_db)):
         avatar = g.get_image()
     except Exception as err:
         print(err)
+
+    #hashed_password = auth_service.get_password_hash(body.password)
 
     new_user = User(  # new_user = User(**body.model_dump(), avatar=avatar)
         username=body.username, email=body.email, password=body.password, avatar=avatar

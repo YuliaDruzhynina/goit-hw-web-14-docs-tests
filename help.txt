@@ -4,7 +4,11 @@ git commit -m "Описание изменений"  # Создание комм
 git pull origin main --rebase  # Обновление локальной ветки с применением изменений из удалённого репозитория
 git push origin main  # Отправка изменений в удалённый репозиторий
 
-pip freeze > requirements.txt
+pip freeze > requirements.txt  # Сохраняем текущие пакеты в файл
+pip uninstall -r requirements.txt -y  # Удаляем все пакеты
+pip install -r requirements.txt  # Устанавливаем снова
+pip install -U pytest
+pip list
 
 docker-compose down -v
 docker-compose up -d
@@ -27,3 +31,4 @@ example: http://127.0.0.1:8000/notes/10
 
 python -m unittest tests.test_repository_contacts
 ? #PYTHONPATH=../src python -m unittest discover -s . -p "test_*.py"
+

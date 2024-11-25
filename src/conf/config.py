@@ -1,6 +1,6 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings
-
+#from typing import Optional
 
 class Settings(BaseSettings):
     POSTGRES_DB: str
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     redis_host: str = "localhost"
     redis_port: int = 6379
     redis_password: str | None = None
-
+    #redis_password: Optional[str] = None
     class Config:
         env_file = "../../.env"
         env_file_encoding = "utf-8"
