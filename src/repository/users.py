@@ -22,7 +22,7 @@ async def get_user_by_email(email: str, db: AsyncSession = Depends(get_db)):
 
     stmt = select(User).filter(User.email == email)
     result = await db.execute(stmt)
-    user = await result.scalar_one_or_none()
+    user = result.scalar_one_or_none()
     return user
 
 

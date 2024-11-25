@@ -60,7 +60,7 @@ def client():
         session = TestingSessionLocal()
         try:
             yield session
-        except Exception as err:
+        except ValueError as err:
             print(f"Error during DB session: {err}")
             await session.rollback()
         finally:
