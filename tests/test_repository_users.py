@@ -1,6 +1,9 @@
 # python -m unittest tests.test_repository_users
+# pytest tests/test_repository_users.py -v
+# pytest -v
+import pytest
 import unittest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import Mock, AsyncMock, patch
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,7 +14,7 @@ from src.repository.users import (
     create_user,
     update_token,
     confirmed_email,
-    update_avatar_url
+    update_avatar_url,
 )
 
 
@@ -43,7 +46,7 @@ class TestContactFunctions(unittest.IsolatedAsyncioTestCase):
             password=self.user_data["password"],
         )
 
-        mock_result = AsyncMock()
+        mock_result = Mock()
 
         # Mock the scalar_one_or_none method to return the user object
         mock_result.scalar_one_or_none.return_value = user
@@ -54,19 +57,19 @@ class TestContactFunctions(unittest.IsolatedAsyncioTestCase):
         # Call the function with the mocked session
         result = await get_user_by_email(self.user_data["email"], db=self.session)
 
-        # Assert that the correct user is returned and the email matches
-        #self.assertEqual(result.email, self.user_data["email"])
-
+        # #Assert that the correct user is returned and the email matches
+        self.assertEqual(result.email, self.user_data["email"])
+        assert result == user
         # Assert that the execute method was called once
         self.session.execute.assert_called_once()
 
     async def test_get_user_by_email_not_found(self):
-        mock_result = AsyncMock()
+        mock_result = Mock()
         mock_result.scalar_one_or_none.return_value = None
         self.session.execute.return_value = mock_result
         result = await get_user_by_email(self.user_data["email"], db=self.session)
 
-        self.assertIsNone(result)
+        assert result is None
         self.session.execute.assert_called_once()
 
     async def test_create_user(self):
@@ -114,17 +117,17 @@ class TestContactFunctions(unittest.IsolatedAsyncioTestCase):
         with patch(
             "src.repository.users.get_user_by_email", return_value=None
         ) as mock_get_user_by_email:
-            
+
             # Calling the function to confirm the email for a non-existent user
             with self.assertRaises(ValueError):
-                
-            # check ValueError for invalid email adress
+
+                # check ValueError for invalid email adress
                 await confirmed_email(incorrect_email, self.session)
 
             # Check that commit was not called since the user was not found
             self.session.commit.assert_not_awaited()
 
-            # Check that commit was not called since the user was not found 
+            # Check that commit was not called since the user was not found
             mock_get_user_by_email.assert_called_once_with(
                 incorrect_email, self.session
             )

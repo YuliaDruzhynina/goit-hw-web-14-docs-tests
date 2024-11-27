@@ -38,20 +38,6 @@ def init_models_wrap():
     asyncio.run(init_models())
 
 
-# @pytest.fixture(scope="module")
-# def session():
-#     # Create the database
-
-#     Base.metadata.drop_all(bind=engine)
-#     Base.metadata.create_all(bind=engine)
-
-#     db = TestingSessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
-
-
 @pytest.fixture(scope="module")
 def client():
     # Dependency override

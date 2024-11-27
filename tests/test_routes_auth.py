@@ -1,8 +1,8 @@
-# import unittest
+# pytest tests/test_routes_auth.py -v
 from unittest.mock import Mock
 import pytest
+from fastapi import status
 from sqlalchemy import select
-
 from src.entity.models import User
 from src.conf import messages
 from tests.conftest import TestingSessionLocal
@@ -17,17 +17,15 @@ user_data = {
 
 @pytest.fixture(autouse=True)
 def mock_request_client(monkeypatch):
-    # Мокаем клиент запросов в starlette
+    # Mocking the request client in Starlette
     monkeypatch.setattr("starlette.requests.Request.client", Mock(host="127.0.0.1"))
 
 
-def test_signup(client, monkeypatch):
+def test_signup(client, monkeypatch):  # client передается как фикстура
     mock_send_email = Mock()
     monkeypatch.setattr("src.services.send_email.send_email", mock_send_email)
     response = client.post("/auth/signup", json=user_data)
     print("Response Text:", response.text)  # Debugging response body
-
-    assert response.status_code == 201, response.text
 
     assert response.status_code == 201, response.text
     data = response.json()
@@ -100,3 +98,29 @@ def test_invalid_email_login(client):
     assert response.status_code == 401, response.text
     data = response.json()
     assert data["detail"] == "Invalid email"
+
+
+def test_validation_error_login(client):
+    response = client.post("/auth/login", data={"password": user_data.get("password")})
+    assert response.status_code == 422, response.text
+    data = response.json()
+    assert "detail" in data
+
+
+@pytest.mark.asyncio
+async def test_protected_route_with_valid_token(
+    client, get_token
+):  # The client is passed as a fixture from the fixture conftest.py
+    token = get_token  # Get the token from the fixture conftest.py
+    response = client.get("/auth/secret", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+    response_json = response.json()
+    assert "owner" in response_json
+    assert response_json["owner"] == "test_email-1@gmail.com"
+
+
+async def test_secret_route_without_token(client):
+    response = client.get("/auth/secret")
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert "detail" in response.json()

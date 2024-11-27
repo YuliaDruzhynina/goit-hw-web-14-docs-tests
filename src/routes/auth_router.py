@@ -114,7 +114,7 @@ async def refresh_token(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    The refresh_token function is used to refresh the access token using the a valid refresh token.
+    The refresh_token function is used to refresh the access token using the valid refresh token.
 
     :param credentials: HTTPAuthorizationCredentials: Get the credentials from the request
     :param db: AsyncSession: Connect to the database. The database session to query the user data
@@ -151,7 +151,7 @@ async def read_item(user: User = Depends(auth_service.get_current_user)):
     :param user: User: The current authenticated user, obtained from the auth service
     :return: dict: A message and the email of the authenticated user
     """
-
+   
     return {"message": "secret router", "owner": user.email}
 
 
