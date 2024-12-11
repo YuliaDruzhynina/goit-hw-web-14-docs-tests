@@ -21,6 +21,7 @@ from src.routes.contact_router import router as contact_router
 from src.routes.email_router import router as email_router
 from src.routes.auth_router import router as auth_router
 from src.routes.user_router import router as user_router
+from src.conf.config import settings
 
 # Loads environment variables from a .env file for use in the FastAPI application.
 load_dotenv()
@@ -34,8 +35,8 @@ async def lifespan(app: FastAPI):
     :param app: The FastAPI application instance.
     """
 
-    r = await redis.Redis(
-        host="localhost", port=6379, db=0, encoding="utf-8", decode_responses=True
+    r = await redis.Redis.from_url(
+        settings.REDIS_URL, encoding="utf-8", decode_responses=True
     )
     await FastAPILimiter.init(r)
     yield
