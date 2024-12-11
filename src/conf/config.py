@@ -3,9 +3,9 @@ from pydantic_settings import BaseSettings
 #from typing import Optional
 
 class Settings(BaseSettings):
-    POSTGRES_DB: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
+    # POSTGRES_DB: str
+    # POSTGRES_USER: str
+    # POSTGRES_PASSWORD: str
     POSTGRES_PORT: int
 
     SQLALCHEMY_DATABASE_URL: str
@@ -26,16 +26,15 @@ class Settings(BaseSettings):
     CLOUDINARY_API_SECRET: str
 
     REDIS_URL: str
-    redis_host: str = "localhost"
-    redis_port: int = 6379
+    # redis_host: str = "localhost"
+    # redis_port: int = 6379
     redis_password: str | None = None
     #redis_password: Optional[str] = None
     class Config:
         env_file = "../../.env"
         env_file_encoding = "utf-8"
         from_attributes = True
-
-#REDIS_URL=redis://localhost:6379/0
+    
 settings = Settings()
 
 
