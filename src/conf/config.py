@@ -26,9 +26,9 @@ class Settings(BaseSettings):
     CLOUDINARY_API_SECRET: str
 
     REDIS_URL: str
-    redis_host: str = "localhost"
-    redis_port: int = 6379
-    redis_password: str | None = None
+    # redis_port: int = 6379
+    # redis_host: str = "localhost"
+    # redis_password: str | None = None
     #redis_password: Optional[str] = None
     class Config:
         env_file = "../../.env"
@@ -38,6 +38,3 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-# print("Cloudinary Name:", settings.CLOUDINARY_NAME)
-# print("Cloudinary API Key:", settings.CLOUDINARY_API_KEY)
-# print("Cloudinary API Secret:", settings.CLOUDINARY_API_SECRET)
