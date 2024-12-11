@@ -35,7 +35,7 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
         from_attributes = True
 
-
+#REDIS_URL=redis://localhost:6379/0
 settings = Settings()
 
 

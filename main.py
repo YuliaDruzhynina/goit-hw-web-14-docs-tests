@@ -1,4 +1,5 @@
 # uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+#http://127.0.0.1:8000/docs - swagger open
 # pip install -r requirements.txt
 # sphinx-quickstart docs
 
@@ -111,6 +112,10 @@ async def user_agent_ban_middleware(request: Request, call_next: Callable):
     response = await call_next(request)
     return response
 
+@app.get("/")
+def read_root():
+    return {"message": "Hello, fastapi application from main.py!"}
+
 
 @app.get("/healthchecker")
 async def root():
@@ -120,7 +125,7 @@ async def root():
     Returns: dict.: JSON with  a welcome message indicating that the API is available
     """
 
-    return {"message": "Welcome to FastAPI!"}
+    return {"message": "Welcome to FastAPI from healthchecker rout!"}
 
 
 # if __name__ == '__main__':

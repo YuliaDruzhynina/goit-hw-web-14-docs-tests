@@ -4,7 +4,6 @@ from fastapi_limiter.depends import RateLimiter
 
 from typing import List
 
-# import json
 from src.database.db import get_db
 from src.entity.models import User, Role
 from src.schemas import ContactResponse, ContactSchema
@@ -24,7 +23,7 @@ def main_root():
     :return: A dictionary with a greeting message.
     """
 
-    return {"message": "Hello, fastapi application!"}
+    return {"message": "Hello, fastapi application from contact_router.py!"}
 
 
 @router.post(
