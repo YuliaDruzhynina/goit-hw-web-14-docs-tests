@@ -77,7 +77,7 @@ async def get_contact_by_id(
     result = await db.execute(stmt)
     if result is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NOT FOUND")
-    contact = await result.scalar_one_or_none()
+    contact = result.scalar_one_or_none()
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="NOT FOUND")
     return contact
@@ -105,7 +105,7 @@ async def get_contact_by_fullname(
         .offset(offset)
     )
     result = await db.execute(stmt)
-    contact = await result.scalar_one_or_none()
+    contact = result.scalar_one_or_none()
     return contact
 
 
@@ -131,7 +131,7 @@ async def get_contact_by_email(
         .offset(offset)
     )
     result = await db.execute(stmt)
-    contact = await result.scalar_one_or_none()
+    contact = result.scalar_one_or_none()
     return contact
 
 
